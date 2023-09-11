@@ -6,7 +6,22 @@ import generateToken from "../utils/generateToken.js"
 // route /api/users/auth
 // @method post
 const authUser = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: "Auth User" })
+  const { email, password } = req.body
+
+  const user = await User.findOne({ email })
+
+  if (user && (await user.matchPassword(password))) {
+    generateToken(res, user._id)
+
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    })
+  } else {
+    res.status(401)
+    throw new Error("Invalid email or password")
+  }
 })
 
 // @desc register user
@@ -25,12 +40,12 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     name,
     email,
-    password
+    password,
   })
 
-  if(!user) {
+  if (!user) {
     res.status(400)
-    throw new Error('Invalid data')
+    throw new Error("Invalid data")
   }
 
   generateToken(res, user._id)
@@ -53,8 +68,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 // route /api/users/profile
 // @method get
 const getUserProfile = asyncHandler(async (req, res) => {
-  const {email} = req.body
-  const user = await User.findOne({email})
+  const { email } = req.body
+  const user = await User.findOne({ email })
   res.status(200).json({ data: user })
 })
 
@@ -70,9 +85,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     password,
   }
 
-  const updatedUser = await User.findOneAndUpdate({email}, updateCredentials)
+  const updatedUser = await User.findOneAndUpdate({ email }, updateCredentials)
 
-  res.status(200).json({ message: `User updated at ${updatedUser.updatedAt}`})
+  res.status(200).json({ message: `User updated at ${updatedUser.updatedAt}` })
 })
 
 export { authUser, registerUser, logoutUser, getUserProfile, updateUserProfile }
