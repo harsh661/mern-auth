@@ -67,12 +67,15 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
 
-  const updatedUser = {
+  const updateCredentials = {
     name,
     email,
     password,
   }
-  res.status(200).json({ message: "Update User" })
+
+  const updatedUser = await User.findOneAndUpdate({email}, updateCredentials)
+
+  res.status(200).json({ message: `User updated at ${updatedUser.updatedAt}`})
 })
 
 export { authUser, registerUser, logoutUser, getUserProfile, updateUserProfile }
