@@ -1,34 +1,42 @@
 import axios from "axios"
 import { useState } from "react"
-import { useNavigate } from "react-router"
 
-const Login = () => {
-  const navigate = useNavigate()
+const Register = () => {
+  const [name, setName] = useState<string>("")
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await axios.post("http://localhost:8000/api/users/auth", {
-        email,
-        password,
-      })
-      .then(() => {
-        navigate('/')
-        console.log('User logged in')
-      })
+      await axios
+        .post("http://localhost:8000/api/users/", {
+          name,
+          email,
+          password,
+        })
+        .then(() => {
+          console.log("User created")
+        })
     } catch (error) {
       console.log(error)
     }
   }
+
   return (
     <div className="shadow-md p-5 m-5 rounded-md flex flex-col items-center">
-      <h1 className="text-xl font-medium">Login</h1>
+      <h1 className="text-xl font-medium">Register</h1>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center gap-10 py-5"
       >
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          placeholder="Name"
+          className="border border-zinc-400 py-2 px-5 rounded-md outline-none"
+        />
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -54,4 +62,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Register
